@@ -125,18 +125,66 @@
     <script>
         // --- DATA ---
         const LOCS = {
-            airport: { lat: 36.3661, lng: 120.0874, title: "칭다오 공항" },
-            beerMuseum: { lat: 36.0790, lng: 120.3420, title: "칭다오 맥주박물관" },
-            signalHill: { lat: 36.0664, lng: 120.3266, title: "신호산 공원" },
-            xiaoyushan: { lat: 36.0587, lng: 120.3313, title: "샤오위산 공원" },
-            zhanqiao: { lat: 36.0590, lng: 120.3168, title: "잔교" },
-            cathedral: { lat: 36.0672, lng: 120.3218, title: "천주교당" },
-            taidong: { lat: 36.0832, lng: 120.3672, title: "타이동 야시장" },
-            hotel: { lat: 36.0957, lng: 120.4646, title: "MGM 호텔" },
-            shilaoren_beach: { lat: 36.0919, lng: 120.4650, title: "석노인 해수욕장" },
-            polar_ocean: { lat: 36.0850, lng: 120.4580, title: "극지해양세계" },
-            mixc: { lat: 36.0675, lng: 120.3875, title: "MIXC 쇼핑센터" },
-            may4: { lat: 36.0625, lng: 120.3845, title: "5.4 광장" }
+            airport: {
+                lat: 36.3661, lng: 120.0874,
+                title: "칭다오 공항",
+                searchName: "Qingdao Liuting International Airport"
+            },
+            beerMuseum: {
+                lat: 36.0790, lng: 120.3420,
+                title: "칭다오 맥주박물관",
+                searchName: "Tsingtao Beer Museum Qingdao"
+            },
+            signalHill: {
+                lat: 36.0664, lng: 120.3266,
+                title: "신호산 공원",
+                searchName: "Xinhao Hill Park Qingdao"
+            },
+            xiaoyushan: {
+                lat: 36.0587, lng: 120.3313,
+                title: "샤오위산 공원",
+                searchName: "Xiaoyushan Park Qingdao"
+            },
+            zhanqiao: {
+                lat: 36.0590, lng: 120.3168,
+                title: "잔교",
+                searchName: "Zhanqiao Pier Qingdao"
+            },
+            cathedral: {
+                lat: 36.0672, lng: 120.3218,
+                title: "천주교당",
+                searchName: "St. Michael's Cathedral Qingdao"
+            },
+            taidong: {
+                lat: 36.0832, lng: 120.3672,
+                title: "타이동 야시장",
+                searchName: "Taidong Pedestrian Street Qingdao"
+            },
+            hotel: {
+                lat: 36.0957, lng: 120.4646,
+                title: "MGM 호텔",
+                searchName: "MGM Qingdao Hotel"
+            },
+            shilaoren_beach: {
+                lat: 36.0919, lng: 120.4650,
+                title: "석노인 해수욕장",
+                searchName: "Shilaoren Beach Qingdao"
+            },
+            polar_ocean: {
+                lat: 36.0850, lng: 120.4580,
+                title: "극지해양세계",
+                searchName: "Qingdao Polar Ocean World"
+            },
+            mixc: {
+                lat: 36.0675, lng: 120.3875,
+                title: "MIXC 쇼핑센터",
+                searchName: "MixC Qingdao Shopping Mall"
+            },
+            may4: {
+                lat: 36.0625, lng: 120.3845,
+                title: "5.4 광장",
+                searchName: "May Fourth Square Qingdao"
+            }
         };
 
         const DAYS = {
@@ -260,8 +308,8 @@
             placeIcon.style.background = color;
             placeIcon.innerHTML = `<i class="fas ${icon}"></i>`;
             placeTitle.textContent = loc.title;
-            placeCoords.textContent = `${loc.lat.toFixed(6)}, ${loc.lng.toFixed(6)}`;
-            placeLink.href = `https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lng}`;
+            placeCoords.textContent = loc.searchName;
+            placeLink.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc.searchName)}`;
 
             // Show panel with animation
             placeInfo.classList.remove('hidden');
@@ -353,13 +401,13 @@
                     }
                 });
 
-                const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lng}`;
+                const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc.searchName)}`;
 
                 const infoWindow = new google.maps.InfoWindow({
-                    content: `<div style="padding: 12px; font-family: 'Noto Sans KR', sans-serif; min-width: 200px;">
+                    content: `<div style="padding: 12px; font-family: 'Noto Sans KR', sans-serif; min-width: 220px;">
                         <div style="font-weight: 700; font-size: 15px; margin-bottom: 6px; color: #1e293b;">${loc.title}</div>
-                        <div style="font-size: 12px; color: #64748b; margin-bottom: 8px;">순서: ${index + 1}번째 방문</div>
-                        <a href="${googleMapsUrl}" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; background: #3B82F6; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 500;">
+                        <div style="font-size: 11px; color: #64748b; margin-bottom: 8px;">${loc.searchName}</div>
+                        <a href="${googleMapsUrl}" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; background: #3B82F6; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 500; transition: all 0.2s;">
                             <i class="fas fa-external-link-alt"></i>
                             구글 맵에서 보기
                         </a>
