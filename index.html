@@ -203,16 +203,16 @@
                 center: { lat: 36.15, lng: 120.35 },
                 zoom: 11,
                 timeline: [
-                    { time: "09:20", title: "칭다오 공항 도착", highlight: true, icon: "fa-plane-arrival", desc: "입국 수속 후 지하철 8호선 탑승" },
-                    { time: "11:00", title: "짐 보관 후 맥주박물관 이동", highlight: false, icon: "fa-subway", desc: "2호선 리촌루역 하차 후 도보 10분" },
-                    { time: "11:30", title: "칭다오 맥주박물관 관람", highlight: false, icon: "fa-beer", desc: "생맥주 시음 포함 약 2시간 관람" },
-                    { time: "13:30", title: "점심 식사 (맥주거리)", highlight: false, icon: "fa-utensils", desc: "박물관 앞 식당가에서 현지식" },
-                    { time: "14:30", title: "신호산 공원", highlight: false, icon: "fa-mountain", desc: "도보 15분, 칭다오 시내 전망 약 1시간" },
-                    { time: "15:30", title: "천주교당", highlight: false, icon: "fa-church", desc: "도보 10분, 성 미카엘 대성당 약 30분" },
-                    { time: "16:00", title: "잔교 산책", highlight: false, icon: "fa-water", desc: "도보 15분, 칭다오 맥주 라벨 배경 약 1시간" },
-                    { time: "17:00", title: "MGM 호텔 체크인", highlight: true, icon: "fa-hotel", desc: "지하철 1호선 → 11호선 (단주마루역)" },
-                    { time: "18:30", title: "타이동 야시장", highlight: false, icon: "fa-shopping-bag", desc: "지하철 11호선 → 3호선. 저녁식사 & 쇼핑" },
-                    { time: "21:00", title: "호텔 복귀", highlight: false, icon: "fa-bed", desc: "지하철로 호텔 복귀 후 휴식" }
+                    { time: "09:20", title: "칭다오 공항 도착", highlight: true, icon: "fa-plane-arrival", desc: "입국 수속 후 지하철 8호선 탑승", location: "airport" },
+                    { time: "11:00", title: "짐 보관 후 맥주박물관 이동", highlight: false, icon: "fa-subway", desc: "2호선 리촌루역 하차 후 도보 10분", location: "beerMuseum" },
+                    { time: "11:30", title: "칭다오 맥주박물관 관람", highlight: false, icon: "fa-beer", desc: "생맥주 시음 포함 약 2시간 관람", location: "beerMuseum" },
+                    { time: "13:30", title: "점심 식사 (맥주거리)", highlight: false, icon: "fa-utensils", desc: "박물관 앞 식당가에서 현지식", location: "beerMuseum" },
+                    { time: "14:30", title: "신호산 공원", highlight: false, icon: "fa-mountain", desc: "도보 15분, 칭다오 시내 전망 약 1시간", location: "signalHill" },
+                    { time: "15:30", title: "천주교당", highlight: false, icon: "fa-church", desc: "도보 10분, 성 미카엘 대성당 약 30분", location: "cathedral" },
+                    { time: "16:00", title: "잔교 산책", highlight: false, icon: "fa-water", desc: "도보 15분, 칭다오 맥주 라벨 배경 약 1시간", location: "zhanqiao" },
+                    { time: "17:00", title: "MGM 호텔 체크인", highlight: true, icon: "fa-hotel", desc: "지하철 1호선 → 11호선 (단주마루역)", location: "hotel" },
+                    { time: "18:30", title: "타이동 야시장", highlight: false, icon: "fa-shopping-bag", desc: "지하철 11호선 → 3호선. 저녁식사 & 쇼핑", location: "taidong" },
+                    { time: "21:00", title: "호텔 복귀", highlight: false, icon: "fa-bed", desc: "지하철로 호텔 복귀 후 휴식", location: "hotel" }
                 ]
             },
             2: {
@@ -227,15 +227,15 @@
                 center: { lat: 36.075, lng: 120.440 },
                 zoom: 13,
                 timeline: [
-                    { time: "07:00", title: "조식 (MGM)", highlight: false, icon: "fa-coffee", desc: "오션뷰 레스토랑에서 든든한 아침" },
-                    { time: "09:00", title: "석노인 해수욕장 산책", highlight: false, icon: "fa-umbrella-beach", desc: "호텔에서 도보 또는 택시 10분. 3km 해안 산책로" },
-                    { time: "11:00", title: "극지해양세계", highlight: false, icon: "fa-fish", desc: "해수욕장에서 도보 15분. 수족관 & 해양동물 공연" },
-                    { time: "13:00", title: "점심 (해변 레스토랑)", highlight: false, icon: "fa-utensils", desc: "해변가 레스토랑에서 해산물 요리" },
-                    { time: "14:30", title: "호텔로 복귀", highlight: false, icon: "fa-hotel", desc: "택시 또는 도보로 호텔 복귀" },
-                    { time: "15:00", title: "호텔 수영장/사우나", highlight: false, icon: "fa-swimming-pool", desc: "인피니티 풀과 사우나 이용" },
-                    { time: "17:30", title: "해피아워 (Happy Hour)", highlight: true, icon: "fa-cocktail", desc: "19:00까지 주류와 음식 무제한. 저녁 식사 해결" },
-                    { time: "19:30", title: "5.4 광장 야경 (선택)", highlight: false, icon: "fa-building", desc: "지하철로 5.4광장 야경 관람 또는 호텔 휴식" },
-                    { time: "21:00", title: "호텔 휴식", highlight: false, icon: "fa-bed", desc: "편안한 휴식" }
+                    { time: "07:00", title: "조식 (MGM)", highlight: false, icon: "fa-coffee", desc: "오션뷰 레스토랑에서 든든한 아침", location: "hotel" },
+                    { time: "09:00", title: "석노인 해수욕장 산책", highlight: false, icon: "fa-umbrella-beach", desc: "호텔에서 도보 또는 택시 10분. 3km 해안 산책로", location: "shilaoren_beach" },
+                    { time: "11:00", title: "극지해양세계", highlight: false, icon: "fa-fish", desc: "해수욕장에서 도보 15분. 수족관 & 해양동물 공연", location: "polar_ocean" },
+                    { time: "13:00", title: "점심 (해변 레스토랑)", highlight: false, icon: "fa-utensils", desc: "해변가 레스토랑에서 해산물 요리", location: "polar_ocean" },
+                    { time: "14:30", title: "호텔로 복귀", highlight: false, icon: "fa-hotel", desc: "택시 또는 도보로 호텔 복귀", location: "hotel" },
+                    { time: "15:00", title: "호텔 수영장/사우나", highlight: false, icon: "fa-swimming-pool", desc: "인피니티 풀과 사우나 이용", location: "hotel" },
+                    { time: "17:30", title: "해피아워 (Happy Hour)", highlight: true, icon: "fa-cocktail", desc: "19:00까지 주류와 음식 무제한. 저녁 식사 해결", location: "hotel" },
+                    { time: "19:30", title: "5.4 광장 야경 (선택)", highlight: false, icon: "fa-building", desc: "지하철로 5.4광장 야경 관람 또는 호텔 휴식", location: "may4" },
+                    { time: "21:00", title: "호텔 휴식", highlight: false, icon: "fa-bed", desc: "편안한 휴식", location: "hotel" }
                 ]
             },
             3: {
@@ -250,14 +250,14 @@
                 center: { lat: 36.20, lng: 120.30 },
                 zoom: 11,
                 timeline: [
-                    { time: "08:00", title: "기상 & 짐 정리", highlight: false, icon: "fa-sun", desc: "체크아웃 준비" },
-                    { time: "09:00", title: "MGM 조식 뷔페", highlight: true, icon: "fa-utensils", desc: "느긋하게 즐기는 마지막 호텔 조식" },
-                    { time: "10:30", title: "MIXC 쇼핑센터", highlight: false, icon: "fa-shopping-bag", desc: "2호선 5.4광장역 하차. 기념품 구매" },
-                    { time: "13:00", title: "호텔 복귀", highlight: false, icon: "fa-subway", desc: "쇼핑한 물건 들고 호텔로" },
-                    { time: "14:00", title: "체크아웃", highlight: true, icon: "fa-suitcase", desc: "호텔 체크아웃" },
-                    { time: "14:30", title: "공항으로 출발", highlight: true, icon: "fa-subway", desc: "지하철 11호선 → 8호선 (약 90분)" },
-                    { time: "16:10", title: "공항 도착", highlight: false, icon: "fa-check-circle", desc: "비행기 출발 2시간 전 도착" },
-                    { time: "18:10", title: "귀국행 비행기", highlight: true, icon: "fa-plane-departure", desc: "칭다오 출발" }
+                    { time: "08:00", title: "기상 & 짐 정리", highlight: false, icon: "fa-sun", desc: "체크아웃 준비", location: "hotel" },
+                    { time: "09:00", title: "MGM 조식 뷔페", highlight: true, icon: "fa-utensils", desc: "느긋하게 즐기는 마지막 호텔 조식", location: "hotel" },
+                    { time: "10:30", title: "MIXC 쇼핑센터", highlight: false, icon: "fa-shopping-bag", desc: "2호선 5.4광장역 하차. 기념품 구매", location: "mixc" },
+                    { time: "13:00", title: "호텔 복귀", highlight: false, icon: "fa-subway", desc: "쇼핑한 물건 들고 호텔로", location: "hotel" },
+                    { time: "14:00", title: "체크아웃", highlight: true, icon: "fa-suitcase", desc: "호텔 체크아웃", location: "hotel" },
+                    { time: "14:30", title: "공항으로 출발", highlight: true, icon: "fa-subway", desc: "지하철 11호선 → 8호선 (약 90분)", location: "hotel" },
+                    { time: "16:10", title: "공항 도착", highlight: false, icon: "fa-check-circle", desc: "비행기 출발 2시간 전 도착", location: "airport" },
+                    { time: "18:10", title: "귀국행 비행기", highlight: true, icon: "fa-plane-departure", desc: "칭다오 출발", location: "airport" }
                 ]
             }
         };
@@ -433,16 +433,53 @@
             data.timeline.forEach((item, i) => {
                 const el = document.createElement('div');
                 el.className = "flex items-start mb-6 relative z-10";
+
+                // Make timeline item clickable if it has a location
+                const isClickable = item.location && LOCS[item.location];
+                const clickableClass = isClickable ? 'cursor-pointer hover:scale-[1.02] transition-transform' : '';
+
                 el.innerHTML = `
                     <div class="flex-shrink-0 w-10 h-10 bg-white border border-gray-200 rounded-full flex items-center justify-center text-gray-500 mr-4 shadow-sm z-10">
                         <i class="fas ${item.icon}"></i>
                     </div>
-                    <div class="flex-grow bg-white p-4 rounded-lg border ${item.highlight ? 'border-amber-300 bg-amber-50' : 'border-gray-100'} shadow-sm">
+                    <div class="flex-grow bg-white p-4 rounded-lg border ${item.highlight ? 'border-amber-300 bg-amber-50' : 'border-gray-100'} shadow-sm ${clickableClass}">
                         <span class="time-badge ${item.highlight ? 'highlight' : ''} mb-1">${item.time}</span>
                         <h4 class="font-bold text-gray-800 text-sm mt-1">${item.title}</h4>
                         <p class="text-xs text-gray-600 mt-1">${item.desc}</p>
+                        ${isClickable ? '<div class="text-xs text-blue-500 mt-2"><i class="fas fa-map-pin mr-1"></i>지도에서 보기</div>' : ''}
                     </div>
                 `;
+
+                // Add click event to show location on map
+                if (isClickable) {
+                    el.addEventListener('click', () => {
+                        const loc = LOCS[item.location];
+                        const markerIndex = data.markers.findIndex(m => m === loc);
+                        if (markerIndex !== -1) {
+                            // Pan to location
+                            map.panTo({ lat: loc.lat, lng: loc.lng });
+                            map.setZoom(15);
+
+                            // Find marker color
+                            let color = '#0F766E';
+                            if (loc.title.includes('공항')) color = '#DB2777';
+                            if (loc.title.includes('호텔') || loc.title.includes('MGM')) color = '#059669';
+                            if (loc.title.includes('맥주')) color = '#D97706';
+                            if (loc.title.includes('해수욕장') || loc.title.includes('잔교')) color = '#3B82F6';
+                            if (loc.title.includes('해양')) color = '#06B6D4';
+                            if (loc.title.includes('쇼핑') || loc.title.includes('MIXC') || loc.title.includes('타이동')) color = '#8B5CF6';
+                            if (loc.title.includes('신호산') || loc.title.includes('샤오위산')) color = '#10B981';
+                            if (loc.title.includes('교당')) color = '#F59E0B';
+                            if (loc.title.includes('광장')) color = '#EF4444';
+
+                            // Trigger marker click
+                            if (markers[markerIndex]) {
+                                google.maps.event.trigger(markers[markerIndex], 'click');
+                            }
+                        }
+                    });
+                }
+
                 tl.appendChild(el);
             });
         }
