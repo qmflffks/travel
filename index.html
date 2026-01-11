@@ -79,6 +79,27 @@
                         <div class="flex items-center"><span class="w-8 h-1 bg-green-600 mr-2"></span> 3호선 (구시가)</div>
                     </div>
                 </div>
+
+                <!-- Selected Place Info -->
+                <div id="place-info" class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 text-sm hidden">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex items-center gap-3">
+                            <div id="place-icon" class="w-12 h-12 rounded-full flex items-center justify-center text-white text-xl"></div>
+                            <div>
+                                <h3 id="place-title" class="font-bold text-lg text-gray-900"></h3>
+                                <p id="place-coords" class="text-xs text-gray-500"></p>
+                            </div>
+                        </div>
+                        <button onclick="closePlaceInfo()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <a id="place-link" href="#" target="_blank" class="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
+                        <i class="fas fa-map-marked-alt"></i>
+                        구글 맵에서 보기
+                    </a>
+                </div>
+
                 <!-- Info Card -->
                 <div id="info-card" class="bg-teal-50 p-5 rounded-xl shadow-sm border border-teal-100 text-sm">
                     <!-- JS Injected -->
@@ -216,6 +237,54 @@
             polylines = [];
         }
 
+        function showPlaceInfo(loc, color, index) {
+            const placeInfo = document.getElementById('place-info');
+            const placeIcon = document.getElementById('place-icon');
+            const placeTitle = document.getElementById('place-title');
+            const placeCoords = document.getElementById('place-coords');
+            const placeLink = document.getElementById('place-link');
+
+            // Get icon based on location type
+            let icon = 'fa-map-marker-alt';
+            if (loc.title.includes('공항')) icon = 'fa-plane';
+            if (loc.title.includes('호텔') || loc.title.includes('MGM')) icon = 'fa-hotel';
+            if (loc.title.includes('맥주')) icon = 'fa-beer';
+            if (loc.title.includes('해수욕장') || loc.title.includes('잔교')) icon = 'fa-umbrella-beach';
+            if (loc.title.includes('해양')) icon = 'fa-fish';
+            if (loc.title.includes('쇼핑') || loc.title.includes('MIXC') || loc.title.includes('타이동')) icon = 'fa-shopping-bag';
+            if (loc.title.includes('신호산') || loc.title.includes('샤오위산')) icon = 'fa-mountain';
+            if (loc.title.includes('교당')) icon = 'fa-church';
+            if (loc.title.includes('광장')) icon = 'fa-building';
+
+            // Update place info panel
+            placeIcon.style.background = color;
+            placeIcon.innerHTML = `<i class="fas ${icon}"></i>`;
+            placeTitle.textContent = loc.title;
+            placeCoords.textContent = `${loc.lat.toFixed(6)}, ${loc.lng.toFixed(6)}`;
+            placeLink.href = `https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lng}`;
+
+            // Show panel with animation
+            placeInfo.classList.remove('hidden');
+            setTimeout(() => {
+                placeInfo.style.opacity = '0';
+                placeInfo.style.transform = 'translateY(10px)';
+                placeInfo.style.transition = 'all 0.3s ease';
+                setTimeout(() => {
+                    placeInfo.style.opacity = '1';
+                    placeInfo.style.transform = 'translateY(0)';
+                }, 10);
+            }, 10);
+        }
+
+        function closePlaceInfo() {
+            const placeInfo = document.getElementById('place-info');
+            placeInfo.style.opacity = '0';
+            placeInfo.style.transform = 'translateY(10px)';
+            setTimeout(() => {
+                placeInfo.classList.add('hidden');
+            }, 300);
+        }
+
         function updateDay(day) {
             const data = DAYS[day];
 
@@ -224,6 +293,12 @@
             document.getElementById(`btn-${day}`).classList.add('active');
             document.getElementById('day-title').textContent = `Day ${day} 일정`;
             document.getElementById('info-card').innerHTML = `<p class="font-bold text-teal-800"><i class="fas fa-info-circle mr-2"></i>Day ${day} 전략</p><p class="mt-1 text-teal-700">${data.info}</p>`;
+
+            // Close place info panel
+            const placeInfo = document.getElementById('place-info');
+            if (placeInfo && !placeInfo.classList.contains('hidden')) {
+                closePlaceInfo();
+            }
 
             // Clear existing map elements
             clearMapElements();
@@ -278,15 +353,22 @@
                     }
                 });
 
+                const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lng}`;
+
                 const infoWindow = new google.maps.InfoWindow({
-                    content: `<div style="padding: 8px; font-family: 'Noto Sans KR', sans-serif;">
-                        <div style="font-weight: 700; font-size: 14px; margin-bottom: 4px;">${loc.title}</div>
-                        <div style="font-size: 12px; color: #64748b;">순서: ${index + 1}번째 방문</div>
+                    content: `<div style="padding: 12px; font-family: 'Noto Sans KR', sans-serif; min-width: 200px;">
+                        <div style="font-weight: 700; font-size: 15px; margin-bottom: 6px; color: #1e293b;">${loc.title}</div>
+                        <div style="font-size: 12px; color: #64748b; margin-bottom: 8px;">순서: ${index + 1}번째 방문</div>
+                        <a href="${googleMapsUrl}" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; background: #3B82F6; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 500;">
+                            <i class="fas fa-external-link-alt"></i>
+                            구글 맵에서 보기
+                        </a>
                     </div>`
                 });
 
                 marker.addListener('click', () => {
                     infoWindow.open(map, marker);
+                    showPlaceInfo(loc, color, index);
                 });
 
                 markers.push(marker);
