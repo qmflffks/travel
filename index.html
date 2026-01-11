@@ -8,9 +8,8 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Leaflet (Map) -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB-zo0WEMahNUf29Oz4qBb73jtCfoDkwd4&callback=initMap" async defer></script>
 
     <!-- FontAwesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -195,16 +194,26 @@
         };
 
         // --- MAP LOGIC ---
-        let map, layerGroup;
+        let map;
+        let markers = [];
+        let polylines = [];
 
         function initMap() {
-            map = L.map('map').setView([LOCS.hotel.lat, LOCS.hotel.lng], 12);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; OpenStreetMap & CartoDB',
-                maxZoom: 19
-            }).addTo(map);
-            layerGroup = L.layerGroup().addTo(map);
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: LOCS.hotel.lat, lng: LOCS.hotel.lng },
+                zoom: 12,
+                mapTypeControl: true,
+                streetViewControl: false,
+                fullscreenControl: true
+            });
             updateDay(1);
+        }
+
+        function clearMapElements() {
+            markers.forEach(marker => marker.setMap(null));
+            polylines.forEach(polyline => polyline.setMap(null));
+            markers = [];
+            polylines = [];
         }
 
         function updateDay(day) {
@@ -216,18 +225,26 @@
             document.getElementById('day-title').textContent = `Day ${day} 일정`;
             document.getElementById('info-card').innerHTML = `<p class="font-bold text-teal-800"><i class="fas fa-info-circle mr-2"></i>Day ${day} 전략</p><p class="mt-1 text-teal-700">${data.info}</p>`;
 
-            // Map Updates
-            layerGroup.clearLayers();
+            // Clear existing map elements
+            clearMapElements();
 
+            // Draw polylines (routes)
             if(data.lines) {
                 data.lines.forEach(line => {
-                    L.polyline(line.path.map(p => [p.lat, p.lng]), {
-                        color: line.color, weight: 5, opacity: 0.7, dashArray: '5, 10'
-                    }).addTo(layerGroup);
+                    const polyline = new google.maps.Polyline({
+                        path: line.path.map(p => ({ lat: p.lat, lng: p.lng })),
+                        geodesic: true,
+                        strokeColor: line.color,
+                        strokeOpacity: 0.7,
+                        strokeWeight: 5,
+                        map: map
+                    });
+                    polylines.push(polyline);
                 });
             }
 
-            data.markers.forEach(loc => {
+            // Add markers
+            data.markers.forEach((loc, index) => {
                 let color = '#0F766E';
                 let icon = 'map-marker-alt';
                 if (loc.title.includes('공항')) { color = '#DB2777'; icon = 'plane'; }
@@ -239,14 +256,45 @@
                 if (loc.title.includes('신호산')) { color = '#10B981'; icon = 'mountain'; }
                 if (loc.title.includes('교당')) { color = '#F59E0B'; icon = 'church'; }
                 if (loc.title.includes('광장')) { color = '#EF4444'; icon = 'building'; }
+                if (loc.title.includes('샤오위산')) { color = '#10B981'; icon = 'mountain'; }
 
-                const html = `<div style="background:${color}" class="w-8 h-8 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white text-sm"><i class="fas fa-${icon}"></i></div>`;
-                L.marker([loc.lat, loc.lng], {
-                    icon: L.divIcon({ html: html, className: 'bg-transparent', iconSize: [32, 32], iconAnchor: [16, 32], popupAnchor: [0, -32] })
-                }).bindPopup(loc.title).addTo(layerGroup);
+                const marker = new google.maps.Marker({
+                    position: { lat: loc.lat, lng: loc.lng },
+                    map: map,
+                    title: loc.title,
+                    label: {
+                        text: String(index + 1),
+                        color: 'white',
+                        fontSize: '14px',
+                        fontWeight: 'bold'
+                    },
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        fillColor: color,
+                        fillOpacity: 1,
+                        strokeColor: 'white',
+                        strokeWeight: 3,
+                        scale: 16
+                    }
+                });
+
+                const infoWindow = new google.maps.InfoWindow({
+                    content: `<div style="padding: 8px; font-family: 'Noto Sans KR', sans-serif;">
+                        <div style="font-weight: 700; font-size: 14px; margin-bottom: 4px;">${loc.title}</div>
+                        <div style="font-size: 12px; color: #64748b;">순서: ${index + 1}번째 방문</div>
+                    </div>`
+                });
+
+                marker.addListener('click', () => {
+                    infoWindow.open(map, marker);
+                });
+
+                markers.push(marker);
             });
 
-            map.flyTo(data.center, data.zoom);
+            // Center and zoom map
+            map.panTo(data.center);
+            map.setZoom(data.zoom);
 
             // Timeline Updates
             const tl = document.getElementById('timeline');
@@ -269,7 +317,7 @@
             });
         }
 
-        window.onload = initMap;
+        // Google Maps API will automatically call initMap() when loaded
     </script>
 </body>
 </html>
