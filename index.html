@@ -1,1004 +1,274 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>칭다오 2박 3일 여행 일정</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>칭다오 2박 3일 여행 일정</title>
 
-    body {
-      font-family: 'Noto Sans KR', sans-serif;
-      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%);
-      color: #1e293b;
-      min-height: 100vh;
-    }
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
-    /* 헤더 */
-    header {
-      background: linear-gradient(135deg, #3b82f6 0%, #1e40af 50%, #f59e0b 100%);
-      padding: 3rem 1rem;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
+    <!-- Leaflet (Map) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    header::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-    }
+    <!-- FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
-    .header-content {
-      position: relative;
-      z-index: 1;
-    }
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: rgba(255,255,255,0.2);
-      backdrop-filter: blur(10px);
-      padding: 0.5rem 1rem;
-      border-radius: 50px;
-      font-size: 0.875rem;
-      color: white;
-      margin-bottom: 1rem;
-    }
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #F3F4F6; }
+        #map { height: 100%; width: 100%; border-radius: 0.75rem; z-index: 10; }
+        .map-wrapper { height: 500px; position: relative; border: 4px solid #fff; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
 
-    h1 {
-      font-size: clamp(2.5rem, 8vw, 4rem);
-      font-weight: 900;
-      margin-bottom: 0.5rem;
-      color: white;
-    }
+        /* Time Badge */
+        .time-badge { background-color: #E5E7EB; color: #374151; font-weight: 700; font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; display: inline-block; min-width: 50px; text-align: center; }
+        .time-badge.highlight { background-color: #FCD34D; color: #92400E; }
 
-    h1 .chinese {
-      background: linear-gradient(90deg, #fef3c7, #fcd34d, #f59e0b);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
+        .timeline-line { position: absolute; left: 23px; top: 20px; bottom: 0; width: 2px; background: #E5E7EB; z-index: 0; }
 
-    .subtitle {
-      color: rgba(255,255,255,0.9);
-      font-size: 1.25rem;
-    }
-
-    .header-info {
-      display: flex;
-      justify-content: center;
-      gap: 2rem;
-      margin-top: 1.5rem;
-      flex-wrap: wrap;
-    }
-
-    .header-info span {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: rgba(255,255,255,0.9);
-      font-size: 0.875rem;
-    }
-
-    /* 탭 네비게이션 */
-    .tabs {
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid #e2e8f0;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    }
-
-    .tabs-inner {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-    }
-
-    .tab {
-      flex: 1;
-      padding: 1rem;
-      text-align: center;
-      cursor: pointer;
-      border: none;
-      background: transparent;
-      color: #94a3b8;
-      font-family: inherit;
-      font-size: 1rem;
-      transition: all 0.3s;
-      position: relative;
-    }
-
-    .tab:hover {
-      color: #475569;
-      background: #f8fafc;
-    }
-
-    .tab.active {
-      color: #1e293b;
-    }
-
-    .tab .day-num {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      opacity: 0.6;
-      margin-bottom: 0.25rem;
-    }
-
-    .tab .day-title {
-      font-weight: 600;
-    }
-
-    .tab::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, #f59e0b, #ea580c);
-      transform: scaleX(0);
-      transition: transform 0.3s;
-    }
-
-    .tab.active::after {
-      transform: scaleX(1);
-    }
-
-    .tab[data-day="2"]::after {
-      background: linear-gradient(90deg, #10b981, #0d9488);
-    }
-
-    .tab[data-day="3"]::after {
-      background: linear-gradient(90deg, #8b5cf6, #7c3aed);
-    }
-
-    /* 메인 컨테이너 */
-    main {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem 1rem;
-    }
-
-    .section-title {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      margin-bottom: 1rem;
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: #1e293b;
-    }
-
-    .section-title .emoji {
-      font-size: 1.5rem;
-    }
-
-    .section-title .sub {
-      color: #64748b;
-      font-size: 0.875rem;
-      font-weight: 400;
-    }
-
-    /* 지도 */
-    .map-container {
-      background: white;
-      border-radius: 1rem;
-      overflow: hidden;
-      border: 1px solid #e2e8f0;
-      margin-bottom: 2rem;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-    }
-
-    .map-wrapper {
-      height: 450px;
-      width: 100%;
-    }
-
-    .leaflet-popup-content-wrapper {
-      background: white;
-      color: #1e293b;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-    }
-
-    .leaflet-popup-tip {
-      background: white;
-    }
-
-    .leaflet-popup-content {
-      margin: 12px 16px;
-    }
-
-    .popup-title {
-      font-weight: 700;
-      font-size: 1rem;
-      margin-bottom: 0.25rem;
-      color: #1e293b;
-    }
-
-    .popup-info {
-      font-size: 0.875rem;
-      color: #64748b;
-    }
-
-    /* 범례 */
-    .legend {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-      padding: 1rem;
-      border-top: 1px solid #e2e8f0;
-      background: #f8fafc;
-    }
-
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: white;
-      padding: 0.5rem 0.75rem;
-      border-radius: 50px;
-      font-size: 0.875rem;
-      cursor: pointer;
-      transition: all 0.2s;
-      border: 1px solid #e2e8f0;
-      color: #475569;
-    }
-
-    .legend-item:hover {
-      border-color: #f59e0b;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-
-    .legend-num {
-      width: 1.5rem;
-      height: 1.5rem;
-      background: linear-gradient(135deg, #f59e0b, #ea580c);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: white;
-    }
-
-    /* 타임라인 */
-    .timeline {
-      position: relative;
-      padding-left: 3rem;
-    }
-
-    .timeline::before {
-      content: '';
-      position: absolute;
-      left: 0.875rem;
-      top: 0;
-      bottom: 0;
-      width: 3px;
-      background: linear-gradient(180deg, #f59e0b 0%, #ea580c 100%);
-      opacity: 0.3;
-      border-radius: 3px;
-    }
-
-    .timeline[data-day="2"]::before {
-      background: linear-gradient(180deg, #10b981 0%, #0d9488 100%);
-    }
-
-    .timeline[data-day="3"]::before {
-      background: linear-gradient(180deg, #8b5cf6 0%, #7c3aed 100%);
-    }
-
-    .timeline-item {
-      position: relative;
-      margin-bottom: 1rem;
-      animation: fadeInUp 0.5s ease-out forwards;
-      opacity: 0;
-    }
-
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .timeline-node {
-      position: absolute;
-      left: -2.125rem;
-      width: 1.75rem;
-      height: 1.75rem;
-      background: linear-gradient(135deg, #f59e0b, #ea580c);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: white;
-      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
-    }
-
-    .timeline[data-day="2"] .timeline-node {
-      background: linear-gradient(135deg, #10b981, #0d9488);
-      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
-    }
-
-    .timeline[data-day="3"] .timeline-node {
-      background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-      box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
-    }
-
-    .timeline-card {
-      background: white;
-      border: 1px solid #e2e8f0;
-      border-radius: 0.75rem;
-      padding: 1rem;
-      transition: all 0.3s;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    }
-
-    .timeline-card:hover {
-      border-color: #f59e0b;
-      transform: translateX(5px);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    }
-
-    .timeline[data-day="2"] .timeline-card:hover {
-      border-color: #10b981;
-    }
-
-    .timeline[data-day="3"] .timeline-card:hover {
-      border-color: #8b5cf6;
-    }
-
-    .timeline-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .timeline-main {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .timeline-time {
-      color: #ea580c;
-      font-family: monospace;
-      font-weight: 700;
-      font-size: 0.875rem;
-      background: #fff7ed;
-      padding: 0.25rem 0.5rem;
-      border-radius: 4px;
-    }
-
-    .timeline[data-day="2"] .timeline-time {
-      color: #059669;
-      background: #ecfdf5;
-    }
-
-    .timeline[data-day="3"] .timeline-time {
-      color: #7c3aed;
-      background: #f5f3ff;
-    }
-
-    .timeline-activity {
-      font-weight: 600;
-      font-size: 1rem;
-      color: #1e293b;
-    }
-
-    .timeline-duration {
-      font-size: 0.75rem;
-      background: #f1f5f9;
-      padding: 0.25rem 0.5rem;
-      border-radius: 50px;
-      color: #64748b;
-    }
-
-    .timeline-details {
-      margin-top: 0.5rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-    }
-
-    .timeline-transport {
-      font-size: 0.875rem;
-      color: #2563eb;
-      display: flex;
-      align-items: center;
-      gap: 0.25rem;
-    }
-
-    .timeline-note {
-      font-size: 0.875rem;
-      color: #d97706;
-      display: flex;
-      align-items: center;
-      gap: 0.25rem;
-    }
-
-    /* 정보 카드 그리드 */
-    .info-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.5rem;
-      margin-top: 2rem;
-    }
-
-    .info-card {
-      background: linear-gradient(135deg, #eff6ff, #ffffff);
-      border: 1px solid #bfdbfe;
-      border-radius: 1rem;
-      padding: 1.5rem;
-    }
-
-    .info-card.amber {
-      background: linear-gradient(135deg, #fffbeb, #ffffff);
-      border-color: #fcd34d;
-    }
-
-    .info-card h3 {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 1.125rem;
-      margin-bottom: 1rem;
-      color: #1e293b;
-    }
-
-    .info-card ul {
-      list-style: none;
-    }
-
-    .info-card li {
-      padding: 0.375rem 0;
-      font-size: 0.875rem;
-      color: #475569;
-    }
-
-    .info-card li strong {
-      color: #2563eb;
-    }
-
-    .info-card.amber li strong {
-      color: #d97706;
-    }
-
-    /* 호텔 카드 */
-    .hotel-card {
-      background: linear-gradient(90deg, #faf5ff, #ffffff, #fffbeb);
-      border: 1px solid #e2e8f0;
-      border-radius: 1rem;
-      padding: 1.5rem;
-      margin-top: 2rem;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-    }
-
-    .hotel-header {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 1rem;
-    }
-
-    .hotel-header .emoji {
-      font-size: 2.5rem;
-    }
-
-    .hotel-header h3 {
-      font-size: 1.25rem;
-      color: #1e293b;
-    }
-
-    .hotel-header p {
-      font-size: 0.875rem;
-      color: #64748b;
-    }
-
-    .hotel-info-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 1rem;
-    }
-
-    .hotel-info-item {
-      background: white;
-      border-radius: 0.5rem;
-      padding: 0.75rem;
-      border: 1px solid #e2e8f0;
-    }
-
-    .hotel-info-item .label {
-      font-size: 0.75rem;
-      color: #64748b;
-      margin-bottom: 0.25rem;
-    }
-
-    .hotel-info-item .value {
-      font-weight: 600;
-      color: #1e293b;
-    }
-
-    .hotel-info-item .value.highlight {
-      color: #d97706;
-    }
-
-    /* 푸터 */
-    footer {
-      margin-top: 3rem;
-      padding: 2rem 1rem;
-      border-top: 1px solid #e2e8f0;
-      text-align: center;
-      color: #64748b;
-      font-size: 0.875rem;
-      background: white;
-    }
-
-    /* 일정 숨김 */
-    .day-content {
-      display: none;
-    }
-
-    .day-content.active {
-      display: block;
-    }
-
-    /* 반응형 */
-    @media (max-width: 640px) {
-      .map-wrapper {
-        height: 350px;
-      }
-
-      .timeline {
-        padding-left: 2.5rem;
-      }
-
-      .timeline-node {
-        left: -1.875rem;
-        width: 1.5rem;
-        height: 1.5rem;
-        font-size: 0.625rem;
-      }
-    }
-  </style>
+        .btn-day { transition: all 0.2s; }
+        .btn-day.active { background-color: #0F766E; color: white; border-color: #0F766E; transform: translateY(-2px); }
+    </style>
 </head>
-<body>
-  <header>
-    <div class="header-content">
-      <div class="badge">
-        <span>🇨🇳</span>
-        <span>중국 산둥성</span>
-      </div>
-      <h1>
-        <span class="chinese">青島</span>
-        <span>칭다오</span>
-      </h1>
-      <p class="subtitle">2박 3일 여행 일정</p>
-      <div class="header-info">
-        <span>🚇 대중교통 이용</span>
-        <span>🍺 맥주의 도시</span>
-        <span>🏖️ 아름다운 해변</span>
-      </div>
-    </div>
-  </header>
+<body class="flex flex-col min-h-screen text-gray-800">
 
-  <nav class="tabs">
-    <div class="tabs-inner">
-      <button class="tab active" data-day="1" onclick="showDay(1)">
-        <div class="day-num">Day 1</div>
-        <div class="day-title">맥주박물관 & 구시가지</div>
-      </button>
-      <button class="tab" data-day="2" onclick="showDay(2)">
-        <div class="day-num">Day 2</div>
-        <div class="day-title">아름다운 해안</div>
-      </button>
-      <button class="tab" data-day="3" onclick="showDay(3)">
-        <div class="day-num">Day 3</div>
-        <div class="day-title">쇼핑 & 공항</div>
-      </button>
-    </div>
-  </nav>
-
-  <main>
-    <!-- Day 1 -->
-    <div class="day-content active" id="day1">
-      <div class="section-title">
-        <span class="emoji">🗺️</span>
-        <span>동선 지도</span>
-        <span class="sub">→ 맥주박물관 & 구시가지</span>
-      </div>
-
-      <div class="map-container">
-        <div class="map-wrapper" id="map1"></div>
-        <div class="legend" id="legend1"></div>
-      </div>
-
-      <div class="section-title">
-        <span class="emoji">📅</span>
-        <span>상세 일정</span>
-      </div>
-
-      <div class="timeline" data-day="1" id="timeline1"></div>
-    </div>
-
-    <!-- Day 2 -->
-    <div class="day-content" id="day2">
-      <div class="section-title">
-        <span class="emoji">🗺️</span>
-        <span>동선 지도</span>
-        <span class="sub">→ 아름다운 해안</span>
-      </div>
-
-      <div class="map-container">
-        <div class="map-wrapper" id="map2"></div>
-        <div class="legend" id="legend2"></div>
-      </div>
-
-      <div class="section-title">
-        <span class="emoji">📅</span>
-        <span>상세 일정</span>
-      </div>
-
-      <div class="timeline" data-day="2" id="timeline2"></div>
-    </div>
-
-    <!-- Day 3 -->
-    <div class="day-content" id="day3">
-      <div class="section-title">
-        <span class="emoji">🗺️</span>
-        <span>동선 지도</span>
-        <span class="sub">→ 쇼핑 & 공항</span>
-      </div>
-
-      <div class="map-container">
-        <div class="map-wrapper" id="map3"></div>
-        <div class="legend" id="legend3"></div>
-      </div>
-
-      <div class="section-title">
-        <span class="emoji">📅</span>
-        <span>상세 일정</span>
-      </div>
-
-      <div class="timeline" data-day="3" id="timeline3"></div>
-    </div>
-
-    <!-- 공통 정보 -->
-    <div class="info-grid">
-      <div class="info-card">
-        <h3>🚇 지하철 정보</h3>
-        <ul>
-          <li>• <strong>8호선</strong>: 공항 → 시내 연결</li>
-          <li>• <strong>11호선</strong>: MGM호텔(단주마루역)</li>
-          <li>• <strong>2호선</strong>: 시내 주요 관광지 (5.4광장)</li>
-          <li>• <strong>3호선</strong>: 타이동, 구시가지, 해안</li>
-          <li style="padding-top: 0.5rem; font-size: 0.75rem; color: #94a3b8;">요금: 2~13위안 (거리 비례)</li>
-        </ul>
-      </div>
-
-      <div class="info-card amber">
-        <h3>💡 여행 팁</h3>
-        <ul>
-          <li>• <strong>고드맵 or 바이두맵 앱</strong> 설치 권장 (구글맵 X)</li>
-          <li>• <strong>위챗페이/알리페이</strong> 준비</li>
-          <li>• 맥주박물관 <strong>트립닷컴 사전예매</strong> 추천</li>
-          <li>• 해피아워: <strong>17:30~19:00</strong></li>
-          <li style="padding-top: 0.5rem; font-size: 0.75rem; color: #94a3b8;">비행기 출발 2시간 전 공항 도착 권장</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="hotel-card">
-      <div class="hotel-header">
-        <span class="emoji">🏨</span>
-        <div>
-          <h3>MGM 칭다오</h3>
-          <p>지하철 11호선 단주마루(单岭路)역 인근</p>
-        </div>
-      </div>
-      <div class="hotel-info-grid">
-        <div class="hotel-info-item">
-          <div class="label">체크인</div>
-          <div class="value">1일차 17:00</div>
-        </div>
-        <div class="hotel-info-item">
-          <div class="label">체크아웃</div>
-          <div class="value">3일차 14:00까지</div>
-        </div>
-        <div class="hotel-info-item">
-          <div class="label">해피아워</div>
-          <div class="value highlight">17:30 ~ 19:00</div>
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <footer>
-    <p>🍺 칭다오 2박 3일 여행 일정표</p>
-    <p>대중교통(지하철) 기준 • MGM 호텔 숙박</p>
-  </footer>
-
-  <script>
-    // 장소 데이터 (실제 좌표)
-    const locations = {
-      airport: { lat: 36.3661, lng: 120.0874, name: '칭다오 자오동 국제공항', icon: '✈️' },
-      hotel: { lat: 36.0872, lng: 120.4285, name: 'MGM 호텔', icon: '🏨' },
-      beerMuseum: { lat: 36.0847, lng: 120.3695, name: '칭다오 맥주박물관', icon: '🍺' },
-      signalHill: { lat: 36.0645, lng: 120.3265, name: '신호산 공원', icon: '⛰️' },
-      zhanqiao: { lat: 36.0590, lng: 120.3168, name: '잔교', icon: '🌉' },
-      cathedral: { lat: 36.0672, lng: 120.3218, name: '천주교당 (성 미카엘 대성당)', icon: '⛪' },
-      taidong: { lat: 36.0832, lng: 120.3672, name: '타이동 야시장', icon: '🍮' },
-      xiaoyushan: { lat: 36.0580, lng: 120.3380, name: '샤오위산 공원', icon: '🏔' },
-      badaguan: { lat: 36.0540, lng: 120.3480, name: '팔대관 풍경구', icon: '🏖️' },
-      beach1: { lat: 36.0545, lng: 120.3350, name: '제1해수욕장', icon: '🏖️' },
-      mixc: { lat: 36.0675, lng: 120.3875, name: 'MIXC 쇼핑센터', icon: '🛍️' },
-      may4: { lat: 36.0625, lng: 120.3845, name: '5.4 광장', icon: '🎡' },
-    };
-
-    // 일정 데이터
-    const schedules = {
-      1: {
-        spots: ['airport', 'beerMuseum', 'signalHill', 'cathedral', 'zhanqiao', 'hotel', 'taidong', 'hotel'],
-        color: '#f59e0b',
-        colorEnd: '#ea580c',
-        timeline: [
-          { time: '09:20', activity: '칭다오 자오동 국제공항 도착', location: 'airport', transport: '지하철 8호선 → 2호선 탑승', duration: '약 1시간 30분' },
-          { time: '11:00', activity: '짐 보관 후 맥주박물관으로 이동', location: 'beerMuseum', transport: '지하철 2호선 리촌루역 → 도보 10분' },
-          { time: '11:30', activity: '칭다오 맥주박물관 관람', location: 'beerMuseum', duration: '약 2시간', note: '생맥주 시음 포함' },
-          { time: '13:30', activity: '점심 식사 (맥주거리)', location: 'beerMuseum', transport: '도보', duration: '약 1시간' },
-          { time: '14:30', activity: '신호산 공원', location: 'signalHill', transport: '도보 15분', duration: '약 1시간', note: '칭다오 시내 전망' },
-          { time: '15:30', activity: '천주교당 (성 미카엘 대성당)', location: 'cathedral', transport: '도보 10분', duration: '약 30분' },
-          { time: '16:00', activity: '잔교 산책', location: 'zhanqiao', transport: '도보 15분', duration: '약 1시간', note: '칭다오 맥주 라벨 배경' },
-          { time: '17:00', activity: 'MGM 호텔 체크인', location: 'hotel', transport: '지하철 1호선 → 11호선 (단주마루역)', duration: '약 40분' },
-          { time: '18:30', activity: '타이동 야시장', location: 'taidong', transport: '지하철 11호선 → 3호선 타이동역', note: '저녁식사 & 쇼핑' },
-          { time: '21:00', activity: '호텔 복귀', location: 'hotel', transport: '지하철' },
-        ]
-      },
-      2: {
-        spots: ['hotel', 'xiaoyushan', 'beach1', 'badaguan', 'hotel', 'may4', 'hotel'],
-        color: '#10b981',
-        colorEnd: '#0d9488',
-        timeline: [
-          { time: '07:00', activity: '호텔 조식', location: 'hotel', duration: '약 1시간' },
-          { time: '09:00', activity: '샤오위산으로 출발', location: 'xiaoyushan', transport: '지하철 2호선 → 3호선 탑승 (바민샤루역)', duration: '약 30분' },
-          { time: '09:30', activity: '샤오위산 공원 관람', location: 'xiaoyushan', duration: '약 1시간 30분', note: '칭다오 붉은 지붕 전경 뷰포인트' },
-          { time: '11:00', activity: '제1해수욕장 산책', location: 'beach1', transport: '도보 10분', duration: '약 40분' },
-          { time: '11:40', activity: '팔대관 풍경구 산책', location: 'badaguan', transport: '도보 15분', duration: '약 1시간', note: '유럽풍 별장 거리' },
-          { time: '12:40', activity: '점심 식사 (팔대관 근처)', location: 'badaguan', duration: '약 1시간' },
-          { time: '14:00', activity: '호텔로 이동', location: 'hotel', transport: '지하철 3호선 → 2호선 → 11호선', duration: '약 40분' },
-          { time: '15:00', activity: '호텔 휴식 / 수영장', location: 'hotel' },
-          { time: '17:30', activity: '🍸 호텔 해피아워 참여', location: 'hotel', duration: '1시간 30분', note: '17:30 ~ 19:00' },
-          { time: '19:30', activity: '5.4 광장 야경', location: 'may4', transport: '지하철 11호선 → 2호선 (우시광장역)', note: '5월의 바람 조형물 야경' },
-          { time: '21:00', activity: '호텔 복귀', location: 'hotel', transport: '지하철' },
-        ]
-      },
-      3: {
-        spots: ['hotel', 'mixc', 'hotel', 'airport'],
-        color: '#8b5cf6',
-        colorEnd: '#7c3aed',
-        timeline: [
-          { time: '08:00', activity: '기상 및 짐 정리', location: 'hotel' },
-          { time: '09:00', activity: 'MIXC 쇼핑센터', location: 'mixc', transport: '지하철 11호선 → 2호선 (우시광장역)', note: '대형 쇼핑몰' },
-          { time: '12:00', activity: '점심 식사 (MIXC 내)', location: 'mixc', duration: '약 1시간' },
-          { time: '13:00', activity: '호텔 복귀 및 체크아웃', location: 'hotel', transport: '지하철', note: '체크아웃 14:00까지' },
-          { time: '14:00', activity: '공항으로 이동', location: 'airport', transport: '지하철 11호선 → 8호선', duration: '약 1시간 30분' },
-          { time: '15:30', activity: '공항 도착 및 체크인', location: 'airport' },
-          { time: '18:10', activity: '✈️ 비행기 출발', location: 'airport' },
-        ]
-      }
-    };
-
-    let maps = {};
-    let currentDay = 1;
-    let mapsInitialized = { 1: false, 2: false, 3: false };
-
-    // 커스텀 마커 아이콘 생성
-    function createIcon(number, color, colorEnd) {
-      return L.divIcon({
-        className: 'custom-marker',
-        html: `<div style="
-          background: linear-gradient(135deg, ${color}, ${colorEnd});
-          width: 32px;
-          height: 32px;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-          font-weight: bold;
-          font-size: 14px;
-          box-shadow: 0 4px 15px ${color}60;
-          border: 3px solid white;
-        ">${number}</div>`,
-        iconSize: [32, 32],
-        iconAnchor: [16, 16],
-        popupAnchor: [0, -20]
-      });
-    }
-
-    // 지도 초기화
-    function initMap(dayNum) {
-      const mapId = `map${dayNum}`;
-      const schedule = schedules[dayNum];
-
-      // 이미 초기화되었으면 invalidateSize만 호출
-      if (mapsInitialized[dayNum]) {
-        if (maps[dayNum]) {
-          maps[dayNum].invalidateSize();
-        }
-        return;
-      }
-
-      // 중심점 계산
-      const uniqueSpots = [...new Set(schedule.spots)];
-      const lats = uniqueSpots.map(s => locations[s].lat);
-      const lngs = uniqueSpots.map(s => locations[s].lng);
-      const centerLat = (Math.min(...lats) + Math.max(...lats)) / 2;
-      const centerLng = (Math.min(...lngs) + Math.max(...lngs)) / 2;
-
-      const map = L.map(mapId, {
-        zoomControl: true,
-        scrollWheelZoom: true
-      }).setView([centerLat, centerLng], 11);
-
-      // 밝은 테마 타일 (CartoDB Positron)
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; OpenStreetMap &copy; CARTO',
-        subdomains: 'abcd',
-        maxZoom: 19
-      }).addTo(map);
-
-      // 경로 그리기
-      const routeCoords = schedule.spots.map(s => [locations[s].lat, locations[s].lng]);
-      L.polyline(routeCoords, {
-        color: schedule.color,
-        weight: 4,
-        opacity: 0.8,
-        dashArray: '10, 8',
-        lineCap: 'round'
-      }).addTo(map);
-
-      // 마커 추가
-      const addedLocations = new Set();
-      let markerNum = 1;
-
-      schedule.spots.forEach((spotKey) => {
-        if (!addedLocations.has(spotKey)) {
-          const spot = locations[spotKey];
-          const marker = L.marker([spot.lat, spot.lng], {
-            icon: createIcon(markerNum, schedule.color, schedule.colorEnd)
-          }).addTo(map);
-
-          marker.bindPopup(`
-            <div class="popup-title">${spot.icon} ${spot.name}</div>
-            <div class="popup-info">순서: ${markerNum}번째 방문</div>
-          `);
-
-          addedLocations.add(spotKey);
-          markerNum++;
-        }
-      });
-
-      // 범위에 맞게 조정
-      const bounds = L.latLngBounds(routeCoords);
-      map.fitBounds(bounds, { padding: [50, 50] });
-
-      maps[dayNum] = map;
-      mapsInitialized[dayNum] = true;
-
-      // 범례 생성
-      createLegend(dayNum, uniqueSpots, schedule.color, schedule.colorEnd);
-    }
-
-    // 범례 생성
-    function createLegend(dayNum, spots, color, colorEnd) {
-      const legendEl = document.getElementById(`legend${dayNum}`);
-      legendEl.innerHTML = spots.map((spotKey, idx) => {
-        const spot = locations[spotKey];
-        return `
-          <div class="legend-item" onclick="focusMarker(${dayNum}, ${spot.lat}, ${spot.lng})">
-            <span class="legend-num" style="background: linear-gradient(135deg, ${color}, ${colorEnd})">${idx + 1}</span>
-            <span>${spot.icon}</span>
-            <span>${spot.name}</span>
-          </div>
-        `;
-      }).join('');
-    }
-
-    // 마커 포커스
-    function focusMarker(dayNum, lat, lng) {
-      if (maps[dayNum]) {
-        maps[dayNum].setView([lat, lng], 14, { animate: true });
-      }
-    }
-
-    // 타임라인 생성
-    function createTimeline(dayNum) {
-      const schedule = schedules[dayNum];
-      const timelineEl = document.getElementById(`timeline${dayNum}`);
-
-      timelineEl.innerHTML = schedule.timeline.map((item, idx) => `
-        <div class="timeline-item" style="animation-delay: ${idx * 0.1}s">
-          <div class="timeline-node">${idx + 1}</div>
-          <div class="timeline-card">
-            <div class="timeline-header">
-              <div class="timeline-main">
-                <span class="timeline-time">${item.time}</span>
-                <span class="timeline-activity">${item.activity}</span>
-              </div>
-              ${item.duration ? `<span class="timeline-duration">${item.duration}</span>` : ''}
+    <!-- Header -->
+    <nav class="bg-white shadow-md sticky top-0 z-[1000]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center">
+                    <i class="fas fa-plane-departure text-teal-700 text-2xl mr-3"></i>
+                    <div>
+                        <h1 class="font-bold text-xl text-gray-900 leading-none">칭다오 2박 3일 여행</h1>
+                        <span class="text-xs text-teal-700 font-bold uppercase tracking-wide">MGM 호텔 | 대중교통 | 해피아워</span>
+                    </div>
+                </div>
             </div>
-            ${item.transport || item.note ? `
-              <div class="timeline-details">
-                ${item.transport ? `<span class="timeline-transport">🚇 ${item.transport}</span>` : ''}
-                ${item.note ? `<span class="timeline-note">💡 ${item.note}</span>` : ''}
-              </div>
-            ` : ''}
-          </div>
         </div>
-      `).join('');
-    }
+    </nav>
 
-    // 일차 전환
-    function showDay(dayNum) {
-      // 탭 업데이트
-      document.querySelectorAll('.tab').forEach(tab => {
-        tab.classList.toggle('active', parseInt(tab.dataset.day) === dayNum);
-      });
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-6">
 
-      // 컨텐츠 업데이트
-      document.querySelectorAll('.day-content').forEach(content => {
-        content.classList.remove('active');
-      });
-      document.getElementById(`day${dayNum}`).classList.add('active');
+        <!-- Day Selector -->
+        <div class="flex space-x-2">
+            <button onclick="updateDay(1)" id="btn-1" class="btn-day active flex-1 px-4 py-3 rounded-lg border border-gray-200 bg-white font-bold shadow-sm text-center">
+                Day 1<br><span class="text-xs font-normal">맥주박물관 & 구시가지</span>
+            </button>
+            <button onclick="updateDay(2)" id="btn-2" class="btn-day flex-1 px-4 py-3 rounded-lg border border-gray-200 bg-white font-bold shadow-sm text-center">
+                Day 2<br><span class="text-xs font-normal">해변 산책 & 해피아워</span>
+            </button>
+            <button onclick="updateDay(3)" id="btn-3" class="btn-day flex-1 px-4 py-3 rounded-lg border border-gray-200 bg-white font-bold shadow-sm text-center">
+                Day 3<br><span class="text-xs font-normal">쇼핑 & 귀국</span>
+            </button>
+        </div>
 
-      currentDay = dayNum;
+        <!-- Main Content -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-      // 지도 초기화 (약간의 딜레이 후 - DOM이 visible 상태가 된 후)
-      setTimeout(() => {
-        initMap(dayNum);
-      }, 150);
-    }
+            <!-- Map Section -->
+            <div class="lg:col-span-2 space-y-4">
+                <div class="map-wrapper">
+                    <div id="map"></div>
+                    <div class="absolute bottom-4 right-4 z-[500] bg-white/95 p-3 rounded-lg shadow border border-gray-200 text-xs">
+                        <div class="font-bold mb-2">지하철 노선</div>
+                        <div class="flex items-center mb-1"><span class="w-8 h-1 bg-pink-500 mr-2"></span> 8호선 (공항)</div>
+                        <div class="flex items-center mb-1"><span class="w-8 h-1 bg-yellow-500 mr-2"></span> 1호선 (시내)</div>
+                        <div class="flex items-center mb-1"><span class="w-8 h-1 bg-red-500 mr-2"></span> 2호선 (호텔)</div>
+                        <div class="flex items-center"><span class="w-8 h-1 bg-green-600 mr-2"></span> 3호선 (구시가)</div>
+                    </div>
+                </div>
+                <!-- Info Card -->
+                <div id="info-card" class="bg-teal-50 p-5 rounded-xl shadow-sm border border-teal-100 text-sm">
+                    <!-- JS Injected -->
+                </div>
+            </div>
 
-    // 초기화
-    document.addEventListener('DOMContentLoaded', () => {
-      // 타임라인 생성
-      createTimeline(1);
-      createTimeline(2);
-      createTimeline(3);
+            <!-- Timeline Section -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-xl shadow border border-gray-200 h-full flex flex-col max-h-[700px]">
+                    <div class="p-5 bg-gray-50 border-b border-gray-200">
+                        <h3 id="day-title" class="text-xl font-bold text-gray-900">Day 1 일정</h3>
+                        <p class="text-xs text-gray-500 mt-1">상세 스케줄</p>
+                    </div>
+                    <div id="timeline" class="p-5 overflow-y-auto flex-grow relative custom-scrollbar">
+                        <!-- JS Injected -->
+                    </div>
+                </div>
+            </div>
 
-      // 첫 번째 지도 초기화
-      setTimeout(() => {
-        initMap(1);
-      }, 200);
-    });
-  </script>
+        </div>
+    </main>
+
+    <script>
+        // --- DATA ---
+        const LOCS = {
+            airport: { lat: 36.3661, lng: 120.0874, title: "칭다오 공항" },
+            beerMuseum: { lat: 36.0847, lng: 120.3695, title: "칭다오 맥주박물관" },
+            signalHill: { lat: 36.0645, lng: 120.3265, title: "신호산 공원" },
+            zhanqiao: { lat: 36.0590, lng: 120.3168, title: "잔교" },
+            cathedral: { lat: 36.0672, lng: 120.3218, title: "천주교당" },
+            taidong: { lat: 36.0832, lng: 120.3672, title: "타이동 야시장" },
+            hotel: { lat: 36.0872, lng: 120.4285, title: "MGM 호텔" },
+            shilaoren_beach: { lat: 36.0710, lng: 120.4520, title: "석노인 해수욕장" },
+            polar_ocean: { lat: 36.0680, lng: 120.4420, title: "극지해양세계" },
+            mixc: { lat: 36.0675, lng: 120.3875, title: "MIXC 쇼핑센터" },
+            may4: { lat: 36.0625, lng: 120.3845, title: "5.4 광장" }
+        };
+
+        const DAYS = {
+            1: {
+                title: "Day 1: 맥주박물관 & 구시가지",
+                info: "공항 도착 후 지하철로 맥주박물관을 관람하고 구시가지를 둘러본 뒤 호텔에 체크인합니다. 저녁은 타이동 야시장에서 즐깁니다.",
+                markers: [LOCS.airport, LOCS.beerMuseum, LOCS.signalHill, LOCS.cathedral, LOCS.zhanqiao, LOCS.hotel, LOCS.taidong],
+                lines: [
+                    { path: [LOCS.airport, LOCS.beerMuseum], color: '#EC4899' },
+                    { path: [LOCS.beerMuseum, LOCS.signalHill], color: '#10B981' },
+                    { path: [LOCS.signalHill, LOCS.cathedral], color: '#10B981' },
+                    { path: [LOCS.cathedral, LOCS.zhanqiao], color: '#10B981' },
+                    { path: [LOCS.zhanqiao, LOCS.hotel], color: '#EF4444' },
+                    { path: [LOCS.hotel, LOCS.taidong], color: '#10B981' }
+                ],
+                center: { lat: 36.15, lng: 120.35 },
+                zoom: 11,
+                timeline: [
+                    { time: "09:20", title: "칭다오 공항 도착", highlight: true, icon: "fa-plane-arrival", desc: "입국 수속 후 지하철 8호선 탑승" },
+                    { time: "11:00", title: "짐 보관 후 맥주박물관 이동", highlight: false, icon: "fa-subway", desc: "2호선 리촌루역 하차 후 도보 10분" },
+                    { time: "11:30", title: "칭다오 맥주박물관 관람", highlight: false, icon: "fa-beer", desc: "생맥주 시음 포함 약 2시간 관람" },
+                    { time: "13:30", title: "점심 식사 (맥주거리)", highlight: false, icon: "fa-utensils", desc: "박물관 앞 식당가에서 현지식" },
+                    { time: "14:30", title: "신호산 공원", highlight: false, icon: "fa-mountain", desc: "도보 15분, 칭다오 시내 전망 약 1시간" },
+                    { time: "15:30", title: "천주교당", highlight: false, icon: "fa-church", desc: "도보 10분, 성 미카엘 대성당 약 30분" },
+                    { time: "16:00", title: "잔교 산책", highlight: false, icon: "fa-water", desc: "도보 15분, 칭다오 맥주 라벨 배경 약 1시간" },
+                    { time: "17:00", title: "MGM 호텔 체크인", highlight: true, icon: "fa-hotel", desc: "지하철 1호선 → 11호선 (단주마루역)" },
+                    { time: "18:30", title: "타이동 야시장", highlight: false, icon: "fa-shopping-bag", desc: "지하철 11호선 → 3호선. 저녁식사 & 쇼핑" },
+                    { time: "21:00", title: "호텔 복귀", highlight: false, icon: "fa-bed", desc: "지하철로 호텔 복귀 후 휴식" }
+                ]
+            },
+            2: {
+                title: "Day 2: 해변 산책 & 해피아워",
+                info: "호텔에서 가까운 석노인 해수욕장과 극지해양세계를 방문합니다. 오후 5시 30분 해피아워에 맞춰 호텔로 복귀하는 것이 핵심입니다.",
+                markers: [LOCS.hotel, LOCS.shilaoren_beach, LOCS.polar_ocean],
+                lines: [
+                    { path: [LOCS.hotel, LOCS.shilaoren_beach], color: '#3B82F6' },
+                    { path: [LOCS.shilaoren_beach, LOCS.polar_ocean], color: '#3B82F6' },
+                    { path: [LOCS.polar_ocean, LOCS.hotel], color: '#3B82F6' }
+                ],
+                center: { lat: 36.075, lng: 120.440 },
+                zoom: 13,
+                timeline: [
+                    { time: "07:00", title: "조식 (MGM)", highlight: false, icon: "fa-coffee", desc: "오션뷰 레스토랑에서 든든한 아침" },
+                    { time: "09:00", title: "석노인 해수욕장 산책", highlight: false, icon: "fa-umbrella-beach", desc: "호텔에서 도보 또는 택시 10분. 3km 해안 산책로" },
+                    { time: "11:00", title: "극지해양세계", highlight: false, icon: "fa-fish", desc: "해수욕장에서 도보 15분. 수족관 & 해양동물 공연" },
+                    { time: "13:00", title: "점심 (해변 레스토랑)", highlight: false, icon: "fa-utensils", desc: "해변가 레스토랑에서 해산물 요리" },
+                    { time: "14:30", title: "호텔로 복귀", highlight: false, icon: "fa-hotel", desc: "택시 또는 도보로 호텔 복귀" },
+                    { time: "15:00", title: "호텔 수영장/사우나", highlight: false, icon: "fa-swimming-pool", desc: "인피니티 풀과 사우나 이용" },
+                    { time: "17:30", title: "해피아워 (Happy Hour)", highlight: true, icon: "fa-cocktail", desc: "19:00까지 주류와 음식 무제한. 저녁 식사 해결" },
+                    { time: "19:30", title: "5.4 광장 야경 (선택)", highlight: false, icon: "fa-building", desc: "지하철로 5.4광장 야경 관람 또는 호텔 휴식" },
+                    { time: "21:00", title: "호텔 휴식", highlight: false, icon: "fa-bed", desc: "편안한 휴식" }
+                ]
+            },
+            3: {
+                title: "Day 3: 조식 & 쇼핑 & 귀국",
+                info: "호텔 조식을 여유롭게 즐기고 체크아웃 전 MIXC 쇼핑몰에서 쇼핑합니다. 14:00 체크아웃 후 공항으로 이동합니다.",
+                markers: [LOCS.hotel, LOCS.mixc, LOCS.airport],
+                lines: [
+                    { path: [LOCS.hotel, LOCS.mixc], color: '#EF4444' },
+                    { path: [LOCS.mixc, LOCS.hotel], color: '#EF4444' },
+                    { path: [LOCS.hotel, LOCS.airport], color: '#EC4899' }
+                ],
+                center: { lat: 36.20, lng: 120.30 },
+                zoom: 11,
+                timeline: [
+                    { time: "08:00", title: "기상 & 짐 정리", highlight: false, icon: "fa-sun", desc: "체크아웃 준비" },
+                    { time: "09:00", title: "MGM 조식 뷔페", highlight: true, icon: "fa-utensils", desc: "느긋하게 즐기는 마지막 호텔 조식" },
+                    { time: "10:30", title: "MIXC 쇼핑센터", highlight: false, icon: "fa-shopping-bag", desc: "2호선 5.4광장역 하차. 기념품 구매" },
+                    { time: "13:00", title: "호텔 복귀", highlight: false, icon: "fa-subway", desc: "쇼핑한 물건 들고 호텔로" },
+                    { time: "14:00", title: "체크아웃", highlight: true, icon: "fa-suitcase", desc: "호텔 체크아웃" },
+                    { time: "14:30", title: "공항으로 출발", highlight: true, icon: "fa-subway", desc: "지하철 11호선 → 8호선 (약 90분)" },
+                    { time: "16:10", title: "공항 도착", highlight: false, icon: "fa-check-circle", desc: "비행기 출발 2시간 전 도착" },
+                    { time: "18:10", title: "귀국행 비행기", highlight: true, icon: "fa-plane-departure", desc: "칭다오 출발" }
+                ]
+            }
+        };
+
+        // --- MAP LOGIC ---
+        let map, layerGroup;
+
+        function initMap() {
+            map = L.map('map').setView([LOCS.hotel.lat, LOCS.hotel.lng], 12);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap & CartoDB',
+                maxZoom: 19
+            }).addTo(map);
+            layerGroup = L.layerGroup().addTo(map);
+            updateDay(1);
+        }
+
+        function updateDay(day) {
+            const data = DAYS[day];
+
+            // UI Updates
+            document.querySelectorAll('.btn-day').forEach(b => b.classList.remove('active'));
+            document.getElementById(`btn-${day}`).classList.add('active');
+            document.getElementById('day-title').textContent = `Day ${day} 일정`;
+            document.getElementById('info-card').innerHTML = `<p class="font-bold text-teal-800"><i class="fas fa-info-circle mr-2"></i>Day ${day} 전략</p><p class="mt-1 text-teal-700">${data.info}</p>`;
+
+            // Map Updates
+            layerGroup.clearLayers();
+
+            if(data.lines) {
+                data.lines.forEach(line => {
+                    L.polyline(line.path.map(p => [p.lat, p.lng]), {
+                        color: line.color, weight: 5, opacity: 0.7, dashArray: '5, 10'
+                    }).addTo(layerGroup);
+                });
+            }
+
+            data.markers.forEach(loc => {
+                let color = '#0F766E';
+                let icon = 'map-marker-alt';
+                if (loc.title.includes('공항')) { color = '#DB2777'; icon = 'plane'; }
+                if (loc.title.includes('호텔') || loc.title.includes('MGM')) { color = '#059669'; icon = 'hotel'; }
+                if (loc.title.includes('맥주')) { color = '#D97706'; icon = 'beer'; }
+                if (loc.title.includes('해수욕장') || loc.title.includes('잔교')) { color = '#3B82F6'; icon = 'umbrella-beach'; }
+                if (loc.title.includes('해양')) { color = '#06B6D4'; icon = 'fish'; }
+                if (loc.title.includes('쇼핑') || loc.title.includes('MIXC') || loc.title.includes('타이동')) { color = '#8B5CF6'; icon = 'shopping-bag'; }
+                if (loc.title.includes('신호산')) { color = '#10B981'; icon = 'mountain'; }
+                if (loc.title.includes('교당')) { color = '#F59E0B'; icon = 'church'; }
+                if (loc.title.includes('광장')) { color = '#EF4444'; icon = 'building'; }
+
+                const html = `<div style="background:${color}" class="w-8 h-8 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white text-sm"><i class="fas fa-${icon}"></i></div>`;
+                L.marker([loc.lat, loc.lng], {
+                    icon: L.divIcon({ html: html, className: 'bg-transparent', iconSize: [32, 32], iconAnchor: [16, 32], popupAnchor: [0, -32] })
+                }).bindPopup(loc.title).addTo(layerGroup);
+            });
+
+            map.flyTo(data.center, data.zoom);
+
+            // Timeline Updates
+            const tl = document.getElementById('timeline');
+            tl.innerHTML = '<div class="timeline-line"></div>';
+
+            data.timeline.forEach((item, i) => {
+                const el = document.createElement('div');
+                el.className = "flex items-start mb-6 relative z-10";
+                el.innerHTML = `
+                    <div class="flex-shrink-0 w-10 h-10 bg-white border border-gray-200 rounded-full flex items-center justify-center text-gray-500 mr-4 shadow-sm z-10">
+                        <i class="fas ${item.icon}"></i>
+                    </div>
+                    <div class="flex-grow bg-white p-4 rounded-lg border ${item.highlight ? 'border-amber-300 bg-amber-50' : 'border-gray-100'} shadow-sm">
+                        <span class="time-badge ${item.highlight ? 'highlight' : ''} mb-1">${item.time}</span>
+                        <h4 class="font-bold text-gray-800 text-sm mt-1">${item.title}</h4>
+                        <p class="text-xs text-gray-600 mt-1">${item.desc}</p>
+                    </div>
+                `;
+                tl.appendChild(el);
+            });
+        }
+
+        window.onload = initMap;
+    </script>
 </body>
 </html>
