@@ -18,49 +18,172 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 
     <style>
-        body { font-family: 'Noto Sans KR', sans-serif; background-color: #F3F4F6; }
-        #map { height: 100%; width: 100%; border-radius: 0.75rem; z-index: 10; }
-        .map-wrapper { height: 500px; position: relative; border: 4px solid #fff; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f0f9ff 100%);
+        }
 
-        /* Time Badge */
-        .time-badge { background-color: #E5E7EB; color: #374151; font-weight: 700; font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; display: inline-block; min-width: 50px; text-align: center; }
-        .time-badge.highlight { background-color: #FCD34D; color: #92400E; }
+        #map {
+            height: 100%;
+            width: 100%;
+            border-radius: 1rem;
+        }
 
-        .timeline-line { position: absolute; left: 23px; top: 20px; bottom: 0; width: 2px; background: #E5E7EB; z-index: 0; }
+        .map-wrapper {
+            height: 550px;
+            position: relative;
+            background: white;
+            border-radius: 1.25rem;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        }
 
-        .btn-day { transition: all 0.2s; }
-        .btn-day.active { background-color: #0F766E; color: white; border-color: #0F766E; transform: translateY(-2px); }
+        .time-badge {
+            background: linear-gradient(135deg, #e5e7eb, #f3f4f6);
+            color: #374151;
+            font-weight: 700;
+            font-size: 0.7rem;
+            padding: 4px 10px;
+            border-radius: 6px;
+            display: inline-block;
+            letter-spacing: 0.5px;
+        }
+
+        .time-badge.highlight {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #78350f;
+            box-shadow: 0 2px 8px rgba(251, 191, 36, 0.3);
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 19px;
+            top: 20px;
+            bottom: 20px;
+            width: 3px;
+            background: linear-gradient(180deg, #0d9488, #14b8a6, #0d9488);
+            border-radius: 3px;
+            z-index: 0;
+        }
+
+        .btn-day {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-day::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-day:hover::before {
+            left: 100%;
+        }
+
+        .btn-day.active {
+            background: linear-gradient(135deg, #0d9488, #14b8a6);
+            color: white;
+            border-color: #0d9488;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(13, 148, 136, 0.3);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #0d9488, #14b8a6);
+            border-radius: 10px;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in-up {
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.8;
+            }
+        }
+
+        .legend-badge {
+            backdrop-filter: blur(12px);
+            transition: all 0.2s;
+        }
+
+        .legend-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
     </style>
 </head>
 <body class="flex flex-col min-h-screen text-gray-800">
 
     <!-- Header -->
-    <nav class="bg-white shadow-md sticky top-0 z-[1000]">
+    <header class="bg-gradient-to-r from-teal-600 via-cyan-600 to-blue-600 shadow-lg sticky top-0 z-[1001]">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16 items-center">
-                <div class="flex items-center">
-                    <i class="fas fa-plane-departure text-teal-700 text-2xl mr-3"></i>
+            <div class="flex justify-between items-center h-20">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                        <i class="fas fa-map-marked-alt text-white text-2xl"></i>
+                    </div>
                     <div>
-                        <h1 class="font-bold text-xl text-gray-900 leading-none">칭다오 2박 3일 여행</h1>
-                        <span class="text-xs text-teal-700 font-bold uppercase tracking-wide">MGM 호텔 | 대중교통 | 해피아워</span>
+                        <h1 class="font-black text-2xl text-white leading-tight">칭다오 여행</h1>
+                        <p class="text-xs text-cyan-100 font-medium mt-0.5">
+                            <i class="fas fa-hotel mr-1"></i>MGM 호텔
+                            <span class="mx-2">•</span>
+                            <i class="fas fa-subway mr-1"></i>대중교통
+                            <span class="mx-2">•</span>
+                            <i class="fas fa-calendar-alt mr-1"></i>2박 3일
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
-    </nav>
+    </header>
 
     <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-6">
 
         <!-- Day Selector -->
-        <div class="flex space-x-2">
-            <button onclick="updateDay(1)" id="btn-1" class="btn-day active flex-1 px-4 py-3 rounded-lg border border-gray-200 bg-white font-bold shadow-sm text-center">
-                Day 1<br><span class="text-xs font-normal">맥주박물관 & 구시가지</span>
+        <div class="grid grid-cols-3 gap-3">
+            <button onclick="updateDay(1)" id="btn-1" class="btn-day active px-6 py-4 rounded-2xl border-2 border-gray-200 bg-white font-bold shadow-lg text-center">
+                <div class="text-lg mb-1">Day 1</div>
+                <div class="text-xs font-normal text-gray-600">맥주박물관 & 구시가지</div>
             </button>
-            <button onclick="updateDay(2)" id="btn-2" class="btn-day flex-1 px-4 py-3 rounded-lg border border-gray-200 bg-white font-bold shadow-sm text-center">
-                Day 2<br><span class="text-xs font-normal">해변 산책 & 해피아워</span>
+            <button onclick="updateDay(2)" id="btn-2" class="btn-day px-6 py-4 rounded-2xl border-2 border-gray-200 bg-white font-bold shadow-lg text-center">
+                <div class="text-lg mb-1">Day 2</div>
+                <div class="text-xs font-normal text-gray-600">해변 산책 & 해피아워</div>
             </button>
-            <button onclick="updateDay(3)" id="btn-3" class="btn-day flex-1 px-4 py-3 rounded-lg border border-gray-200 bg-white font-bold shadow-sm text-center">
-                Day 3<br><span class="text-xs font-normal">쇼핑 & 귀국</span>
+            <button onclick="updateDay(3)" id="btn-3" class="btn-day px-6 py-4 rounded-2xl border-2 border-gray-200 bg-white font-bold shadow-lg text-center">
+                <div class="text-lg mb-1">Day 3</div>
+                <div class="text-xs font-normal text-gray-600">쇼핑 & 귀국</div>
             </button>
         </div>
 
@@ -71,49 +194,59 @@
             <div class="lg:col-span-2 space-y-4">
                 <div class="map-wrapper">
                     <div id="map"></div>
-                    <div class="absolute bottom-4 right-4 z-[500] bg-white/95 p-3 rounded-lg shadow border border-gray-200 text-xs">
-                        <div class="font-bold mb-2">지하철 노선</div>
-                        <div class="flex items-center mb-1"><span class="w-8 h-1 bg-pink-500 mr-2"></span> 8호선 (공항)</div>
-                        <div class="flex items-center mb-1"><span class="w-8 h-1 bg-yellow-500 mr-2"></span> 1호선 (시내)</div>
-                        <div class="flex items-center mb-1"><span class="w-8 h-1 bg-red-500 mr-2"></span> 2호선 (호텔)</div>
-                        <div class="flex items-center"><span class="w-8 h-1 bg-green-600 mr-2"></span> 3호선 (구시가)</div>
+                    <div class="absolute top-4 right-4 z-[500] bg-white/95 backdrop-blur-md p-4 rounded-xl shadow-lg border border-gray-200 text-xs">
+                        <div class="font-bold mb-3 text-gray-800 flex items-center gap-2">
+                            <i class="fas fa-subway text-teal-600"></i>
+                            지하철 노선
+                        </div>
+                        <div class="space-y-2">
+                            <div class="flex items-center"><span class="w-10 h-1.5 bg-pink-500 mr-2 rounded"></span><span class="text-gray-700">8호선 (공항)</span></div>
+                            <div class="flex items-center"><span class="w-10 h-1.5 bg-yellow-500 mr-2 rounded"></span><span class="text-gray-700">1호선 (시내)</span></div>
+                            <div class="flex items-center"><span class="w-10 h-1.5 bg-red-500 mr-2 rounded"></span><span class="text-gray-700">2호선 (호텔)</span></div>
+                            <div class="flex items-center"><span class="w-10 h-1.5 bg-green-600 mr-2 rounded"></span><span class="text-gray-700">3호선 (구시가)</span></div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Selected Place Info -->
-                <div id="place-info" class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 text-sm hidden">
-                    <div class="flex items-start justify-between mb-3">
-                        <div class="flex items-center gap-3">
-                            <div id="place-icon" class="w-12 h-12 rounded-full flex items-center justify-center text-white text-xl"></div>
+                <div id="place-info" class="bg-gradient-to-br from-white to-blue-50 p-6 rounded-2xl shadow-lg border-2 border-blue-100 text-sm hidden animate-fade-in-up">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center gap-4">
+                            <div id="place-icon" class="w-14 h-14 rounded-2xl flex items-center justify-center text-white text-2xl shadow-lg"></div>
                             <div>
-                                <h3 id="place-title" class="font-bold text-lg text-gray-900"></h3>
+                                <h3 id="place-title" class="font-bold text-xl text-gray-900 mb-1"></h3>
                                 <p id="place-coords" class="text-xs text-gray-500"></p>
                             </div>
                         </div>
-                        <button onclick="closePlaceInfo()" class="text-gray-400 hover:text-gray-600">
-                            <i class="fas fa-times"></i>
+                        <button onclick="closePlaceInfo()" class="text-gray-400 hover:text-gray-600 transition p-2">
+                            <i class="fas fa-times text-lg"></i>
                         </button>
                     </div>
-                    <a id="place-link" href="#" target="_blank" class="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
-                        <i class="fas fa-map-marked-alt"></i>
+                    <a id="place-link" href="#" target="_blank" class="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-5 py-3 rounded-xl text-sm font-bold transition shadow-md hover:shadow-lg">
+                        <i class="fas fa-external-link-alt"></i>
                         구글 맵에서 보기
                     </a>
                 </div>
 
                 <!-- Info Card -->
-                <div id="info-card" class="bg-teal-50 p-5 rounded-xl shadow-sm border border-teal-100 text-sm">
+                <div id="info-card" class="bg-gradient-to-br from-teal-50 to-cyan-50 p-6 rounded-2xl shadow-lg border border-teal-100 text-sm">
                     <!-- JS Injected -->
                 </div>
             </div>
 
             <!-- Timeline Section -->
             <div class="lg:col-span-1">
-                <div class="bg-white rounded-xl shadow border border-gray-200 h-full flex flex-col max-h-[700px]">
-                    <div class="p-5 bg-gray-50 border-b border-gray-200">
-                        <h3 id="day-title" class="text-xl font-bold text-gray-900">Day 1 일정</h3>
-                        <p class="text-xs text-gray-500 mt-1">상세 스케줄</p>
+                <div class="bg-white rounded-2xl shadow-lg border border-gray-200 h-full flex flex-col" style="max-height: 750px;">
+                    <div class="p-6 bg-gradient-to-r from-teal-50 to-cyan-50 border-b border-gray-200 rounded-t-2xl">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-10 h-10 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-calendar-check text-white"></i>
+                            </div>
+                            <h3 id="day-title" class="text-2xl font-black text-gray-900">Day 1 일정</h3>
+                        </div>
+                        <p class="text-xs text-gray-500 ml-13">상세 스케줄을 클릭하면 지도에서 확인할 수 있습니다</p>
                     </div>
-                    <div id="timeline" class="p-5 overflow-y-auto flex-grow relative custom-scrollbar">
+                    <div id="timeline" class="p-6 overflow-y-auto flex-grow relative custom-scrollbar">
                         <!-- JS Injected -->
                     </div>
                 </div>
@@ -121,6 +254,22 @@
 
         </div>
     </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="text-center">
+                <p class="text-sm text-gray-500">
+                    <i class="fas fa-plane-departure text-teal-600 mr-2"></i>
+                    칭다오 2박 3일 여행 일정표
+                </p>
+                <p class="text-xs text-gray-400 mt-2">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    지도 마커를 클릭하거나 일정을 클릭하면 구글 맵에서 상세 정보를 확인할 수 있습니다
+                </p>
+            </div>
+        </div>
+    </footer>
 
     <script>
         // --- DATA ---
@@ -273,7 +422,19 @@
                 zoom: 12,
                 mapTypeControl: true,
                 streetViewControl: false,
-                fullscreenControl: true
+                fullscreenControl: true,
+                styles: [
+                    {
+                        featureType: 'water',
+                        elementType: 'geometry',
+                        stylers: [{ color: '#e0f2fe' }]
+                    },
+                    {
+                        featureType: 'landscape',
+                        elementType: 'geometry',
+                        stylers: [{ color: '#f8fafc' }]
+                    }
+                ]
             });
             updateDay(1);
         }
@@ -305,7 +466,7 @@
             if (loc.title.includes('광장')) icon = 'fa-building';
 
             // Update place info panel
-            placeIcon.style.background = color;
+            placeIcon.style.background = `linear-gradient(135deg, ${color}, ${adjustBrightness(color, 20)})`;
             placeIcon.innerHTML = `<i class="fas ${icon}"></i>`;
             placeTitle.textContent = loc.title;
             placeCoords.textContent = loc.searchName;
@@ -315,8 +476,8 @@
             placeInfo.classList.remove('hidden');
             setTimeout(() => {
                 placeInfo.style.opacity = '0';
-                placeInfo.style.transform = 'translateY(10px)';
-                placeInfo.style.transition = 'all 0.3s ease';
+                placeInfo.style.transform = 'translateY(20px)';
+                placeInfo.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
                 setTimeout(() => {
                     placeInfo.style.opacity = '1';
                     placeInfo.style.transform = 'translateY(0)';
@@ -324,10 +485,22 @@
             }, 10);
         }
 
+        function adjustBrightness(color, percent) {
+            const num = parseInt(color.replace('#', ''), 16);
+            const amt = Math.round(2.55 * percent);
+            const R = (num >> 16) + amt;
+            const G = (num >> 8 & 0x00FF) + amt;
+            const B = (num & 0x0000FF) + amt;
+            return '#' + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+                (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+                (B < 255 ? B < 1 ? 0 : B : 255))
+                .toString(16).slice(1);
+        }
+
         function closePlaceInfo() {
             const placeInfo = document.getElementById('place-info');
             placeInfo.style.opacity = '0';
-            placeInfo.style.transform = 'translateY(10px)';
+            placeInfo.style.transform = 'translateY(20px)';
             setTimeout(() => {
                 placeInfo.classList.add('hidden');
             }, 300);
@@ -340,7 +513,17 @@
             document.querySelectorAll('.btn-day').forEach(b => b.classList.remove('active'));
             document.getElementById(`btn-${day}`).classList.add('active');
             document.getElementById('day-title').textContent = `Day ${day} 일정`;
-            document.getElementById('info-card').innerHTML = `<p class="font-bold text-teal-800"><i class="fas fa-info-circle mr-2"></i>Day ${day} 전략</p><p class="mt-1 text-teal-700">${data.info}</p>`;
+            document.getElementById('info-card').innerHTML = `
+                <div class="flex items-start gap-3">
+                    <div class="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-info-circle text-white"></i>
+                    </div>
+                    <div>
+                        <p class="font-bold text-teal-900 text-base mb-1">Day ${day} 여행 전략</p>
+                        <p class="text-teal-700 leading-relaxed">${data.info}</p>
+                    </div>
+                </div>
+            `;
 
             // Close place info panel
             const placeInfo = document.getElementById('place-info');
@@ -358,8 +541,8 @@
                         path: line.path.map(p => ({ lat: p.lat, lng: p.lng })),
                         geodesic: true,
                         strokeColor: line.color,
-                        strokeOpacity: 0.7,
-                        strokeWeight: 5,
+                        strokeOpacity: 0.8,
+                        strokeWeight: 6,
                         map: map
                     });
                     polylines.push(polyline);
@@ -369,17 +552,15 @@
             // Add markers
             data.markers.forEach((loc, index) => {
                 let color = '#0F766E';
-                let icon = 'map-marker-alt';
-                if (loc.title.includes('공항')) { color = '#DB2777'; icon = 'plane'; }
-                if (loc.title.includes('호텔') || loc.title.includes('MGM')) { color = '#059669'; icon = 'hotel'; }
-                if (loc.title.includes('맥주')) { color = '#D97706'; icon = 'beer'; }
-                if (loc.title.includes('해수욕장') || loc.title.includes('잔교')) { color = '#3B82F6'; icon = 'umbrella-beach'; }
-                if (loc.title.includes('해양')) { color = '#06B6D4'; icon = 'fish'; }
-                if (loc.title.includes('쇼핑') || loc.title.includes('MIXC') || loc.title.includes('타이동')) { color = '#8B5CF6'; icon = 'shopping-bag'; }
-                if (loc.title.includes('신호산')) { color = '#10B981'; icon = 'mountain'; }
-                if (loc.title.includes('교당')) { color = '#F59E0B'; icon = 'church'; }
-                if (loc.title.includes('광장')) { color = '#EF4444'; icon = 'building'; }
-                if (loc.title.includes('샤오위산')) { color = '#10B981'; icon = 'mountain'; }
+                if (loc.title.includes('공항')) color = '#DB2777';
+                if (loc.title.includes('호텔') || loc.title.includes('MGM')) color = '#059669';
+                if (loc.title.includes('맥주')) color = '#D97706';
+                if (loc.title.includes('해수욕장') || loc.title.includes('잔교')) color = '#3B82F6';
+                if (loc.title.includes('해양')) color = '#06B6D4';
+                if (loc.title.includes('쇼핑') || loc.title.includes('MIXC') || loc.title.includes('타이동')) color = '#8B5CF6';
+                if (loc.title.includes('신호산') || loc.title.includes('샤오위산')) color = '#10B981';
+                if (loc.title.includes('교당')) color = '#F59E0B';
+                if (loc.title.includes('광장')) color = '#EF4444';
 
                 const marker = new google.maps.Marker({
                     position: { lat: loc.lat, lng: loc.lng },
@@ -396,18 +577,19 @@
                         fillColor: color,
                         fillOpacity: 1,
                         strokeColor: 'white',
-                        strokeWeight: 3,
-                        scale: 16
-                    }
+                        strokeWeight: 4,
+                        scale: 18
+                    },
+                    animation: google.maps.Animation.DROP
                 });
 
                 const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc.searchName)}`;
 
                 const infoWindow = new google.maps.InfoWindow({
-                    content: `<div style="padding: 12px; font-family: 'Noto Sans KR', sans-serif; min-width: 220px;">
-                        <div style="font-weight: 700; font-size: 15px; margin-bottom: 6px; color: #1e293b;">${loc.title}</div>
-                        <div style="font-size: 11px; color: #64748b; margin-bottom: 8px;">${loc.searchName}</div>
-                        <a href="${googleMapsUrl}" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; background: #3B82F6; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 500; transition: all 0.2s;">
+                    content: `<div style="padding: 16px; font-family: 'Noto Sans KR', sans-serif; min-width: 240px;">
+                        <div style="font-weight: 900; font-size: 16px; margin-bottom: 8px; color: #1e293b;">${loc.title}</div>
+                        <div style="font-size: 12px; color: #64748b; margin-bottom: 12px; line-height: 1.4;">${loc.searchName}</div>
+                        <a href="${googleMapsUrl}" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #3B82F6, #2563EB); color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 600; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);">
                             <i class="fas fa-external-link-alt"></i>
                             구글 맵에서 보기
                         </a>
@@ -432,21 +614,22 @@
 
             data.timeline.forEach((item, i) => {
                 const el = document.createElement('div');
-                el.className = "flex items-start mb-6 relative z-10";
+                el.className = "flex items-start mb-5 relative z-10 animate-fade-in-up";
+                el.style.animationDelay = `${i * 0.05}s`;
 
                 // Make timeline item clickable if it has a location
                 const isClickable = item.location && LOCS[item.location];
-                const clickableClass = isClickable ? 'cursor-pointer hover:scale-[1.02] transition-transform' : '';
+                const clickableClass = isClickable ? 'cursor-pointer hover:scale-[1.03] transition-all duration-300' : '';
 
                 el.innerHTML = `
-                    <div class="flex-shrink-0 w-10 h-10 bg-white border border-gray-200 rounded-full flex items-center justify-center text-gray-500 mr-4 shadow-sm z-10">
-                        <i class="fas ${item.icon}"></i>
+                    <div class="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-teal-500 to-cyan-500 border-2 border-white rounded-full flex items-center justify-center text-white mr-4 shadow-lg z-10">
+                        <i class="fas ${item.icon} text-sm"></i>
                     </div>
-                    <div class="flex-grow bg-white p-4 rounded-lg border ${item.highlight ? 'border-amber-300 bg-amber-50' : 'border-gray-100'} shadow-sm ${clickableClass}">
-                        <span class="time-badge ${item.highlight ? 'highlight' : ''} mb-1">${item.time}</span>
-                        <h4 class="font-bold text-gray-800 text-sm mt-1">${item.title}</h4>
-                        <p class="text-xs text-gray-600 mt-1">${item.desc}</p>
-                        ${isClickable ? '<div class="text-xs text-blue-500 mt-2"><i class="fas fa-map-pin mr-1"></i>지도에서 보기</div>' : ''}
+                    <div class="flex-grow bg-white p-4 rounded-xl border-2 ${item.highlight ? 'border-amber-400 bg-gradient-to-br from-amber-50 to-orange-50' : 'border-gray-200'} shadow-md ${clickableClass} hover:shadow-xl">
+                        <span class="time-badge ${item.highlight ? 'highlight' : ''} mb-2">${item.time}</span>
+                        <h4 class="font-bold text-gray-900 text-sm mt-2 leading-tight">${item.title}</h4>
+                        <p class="text-xs text-gray-600 mt-1.5 leading-relaxed">${item.desc}</p>
+                        ${isClickable ? '<div class="text-xs text-blue-600 mt-2 font-medium"><i class="fas fa-map-pin mr-1"></i>지도에서 보기</div>' : ''}
                     </div>
                 `;
 
@@ -458,7 +641,7 @@
                         if (markerIndex !== -1) {
                             // Pan to location
                             map.panTo({ lat: loc.lat, lng: loc.lng });
-                            map.setZoom(15);
+                            map.setZoom(16);
 
                             // Find marker color
                             let color = '#0F766E';
